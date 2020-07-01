@@ -1,6 +1,10 @@
+/* SPDX-License-Identifier: MIT */
+/* Copyright (c) 1999 Bob Doiron, 2020 Michael Ortmann */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #define DEBUG 0
 #define CHECK 0 /* don't bother checking bin for validity... */
@@ -111,7 +115,7 @@ typedef struct track
    unsigned long size; /* track size in bytes */
 } tTrack;
 
-buffered_fread(unsigned char *array, unsigned int size) {
+int buffered_fread(unsigned char *array, unsigned int size) {
    unsigned int i;
    
    if(INBUF_WIDX == 0) {    
@@ -679,8 +683,9 @@ int   main(int argc, char **argv) {
 
    /* Tell them what I am. */
    printf ("\n%s, %s", __DATE__, __TIME__);
-   printf ("\nbin2iso V1.9b - Converts RAW format (.bin) files to ISO/WAV format"); 
+   printf ("\nbin2iso V1.9bm - Converts RAW format (.bin) files to ISO/WAV format"); 
    printf ("\n               Bob Doiron, ICQ#280251                     \n");
+   printf ("\n               Michael Ortmann\n");
    printf ("\nCheck for updates at http://users.andara.com/~doiron\n\n");
    if(argc < 2) {
       printf("Usage: bin2iso <cuefile> [<output dir>] [-[a]wg] [-t XX] [-i] [-nob]\n");
