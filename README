@@ -2,6 +2,9 @@ Description:
 
   bin2iso converts RAW format (.bin) files to ISO/WAV format.
 
+  This is version 1.9b from http://users.andara.com/~doiron (dead link) plus
+  some patches by gentoo and me.
+
 Usage:
 
   Usage: bin2iso <cuefile> [<output dir>] [-[a]wg] [-t XX] [-i] [-nob]
@@ -67,6 +70,7 @@ Revision History
 v1.9bm
  - Fixed a bug
  - Fixed 2 compiler warnings with linux / glibc / gcc
+ - Applied bin2iso-19b-sanity-checks.patch from gentoo
 
 v1.9b
  - Oops.. was no way to turn writegap off: 
