@@ -237,6 +237,10 @@ int getTrackinfo(char *Line, tTrack *track)
    // Get the 'mode'
    if (strncmp(&Line[2], "TRACK ", 6)==0) 
    {
+      if (Line[8] < '0' || Line[8] > '9' || Line[9] < '0' || Line[9] > '9') {
+        printf("Error: Track # is not a 2 digit number\n");
+        exit(1);
+      }
       strncpy(track->num, &Line[8], 2); track->num[2] = '\0';
 
       track->mode = UNKNOWN;
@@ -246,7 +250,11 @@ int getTrackinfo(char *Line, tTrack *track)
       if(strncmp(&Line[11], "MODE2/2352", 10)==0) track->mode = MODE2_2352;
       if(strncmp(&Line[11], "MODE2/2336", 10)==0) track->mode = MODE2_2336;
    }
-   else return(1);
+   else
+   {
+      printf("Error: 2nd line does not begin with '  TRACK '\n");
+      exit(1);
+   }
    
    // Set the name
    strcpy(track->name, sBinFilename);
