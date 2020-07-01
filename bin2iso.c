@@ -1,10 +1,17 @@
 /* SPDX-License-Identifier: MIT */
 /* Copyright (c) 1999 Bob Doiron, 2020 Michael Ortmann */
 
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
+
+#ifdef __DOS__
+  #include <io.h>
+  #define ftruncate chsize
+#else
+  #include <unistd.h>
+#endif
 
 #define DEBUG 0
 #define CHECK 0 /* don't bother checking bin for validity... */
@@ -92,14 +99,20 @@ char sOutFilename[256];
 
 unsigned long int writepos = 0; // for inplace conversions...
 
-   
-#define OUTBUF_SIZE 4*1024*1024
-#define INBUF_SIZE 4*1024*1024
+
+#ifdef __DOS__
+  #define OUTBUF_SIZE 4*1024*4
+  #define INBUF_SIZE 4*1024*4
+#else
+  #define OUTBUF_SIZE 4*1024*1024
+  #define INBUF_SIZE 4*1024*1024
+#endif
 unsigned char OUTBUF[OUTBUF_SIZE]; 
 unsigned int OUTBUF_IDX = 0;
 unsigned char INBUF[INBUF_SIZE]; 
 unsigned int INBUF_RIDX = 0;
 unsigned int INBUF_WIDX = 0;
+unsigned char buf[SIZERAW + 100];
 
 int mode2to1 = 0;
 
@@ -314,7 +327,6 @@ int getTrackinfo(char *Line, tTrack *track)
 
 void dotrack(short mode, long preidx, long startidx, long endidx, unsigned long offset) 
 {
-   unsigned char buf[SIZERAW+100];
    unsigned long blockswritten = 0;
    unsigned int uiLastIndex;
 #if CHECK
@@ -344,9 +356,9 @@ void dotrack(short mode, long preidx, long startidx, long endidx, unsigned long 
                                                        // - of course this isn't true for bootable cd's...
 
    if(sOutFilename[0] != '\0') {
-      printf("Creating %s (%06d,%06d) ", sOutFilename, startidx, endidx-1);
+      printf("Creating %s (%06ld,%06ld) ", sOutFilename, startidx, endidx-1);
    } else {
-      printf("Converting (%06d,%06d) ", startidx, endidx-1);
+      printf("Converting (%06ld,%06ld) ", startidx, endidx-1);
    }
    switch(mode)
    {
@@ -425,14 +437,14 @@ void dotrack(short mode, long preidx, long startidx, long endidx, unsigned long 
          buffered_fwrite( buf, SIZERAW );   
          uiLastIndex++;
          memset( &buf[0], '\0', sizeof( buf ) );
-         if (startidx%PROG_INTERVAL == 0) { printf("\b\b\b\b\b\b%06d", startidx); }
+         if (startidx%PROG_INTERVAL == 0) { printf("\b\b\b\b\b\b%06ld", startidx); }
          if (++startidx == endidx) { printf("\b\b\b\b\b\bComplete\n"); break; }
       }
    } else if (mode == MODE1_2048) {
       while( buffered_fread( buf, SIZEISO_MODE1) ) {         
          buffered_fwrite( buf, SIZEISO_MODE1 );   
          uiLastIndex++;
-         if (startidx%PROG_INTERVAL == 0) { printf("\b\b\b\b\b\b%06d", startidx); }
+         if (startidx%PROG_INTERVAL == 0) { printf("\b\b\b\b\b\b%06ld", startidx); }
          if (++startidx == endidx) { printf("\b\b\b\b\b\bComplete\n"); break; }
       }
    } else {
@@ -506,7 +518,7 @@ void dotrack(short mode, long preidx, long startidx, long endidx, unsigned long 
          }         
             
          memset( &buf[0], '\0', sizeof( buf ) );
-         if (startidx%PROG_INTERVAL == 0) { printf("\b\b\b\b\b\b%06d", startidx); }
+         if (startidx%PROG_INTERVAL == 0) { printf("\b\b\b\b\b\b%06ld", startidx); }
          if (++startidx == endidx) { printf("\b\b\b\b\b\bComplete\n"); break; }
       }
    }
@@ -542,8 +554,7 @@ void doCueFile(void) {
    char mode[12] = "AUDIO";
    char index0[9] = "00:00:00";
    char index1[9] = "00:00:00";
-   unsigned char buf[SIZERAW+100];
-    
+
    printf(            "FILE %s BINARY\n", sBinFilename);
    fprintf(fdCueFile, "FILE %s BINARY\n", sBinFilename);
    memset( buf, '\0', sizeof( buf ) );
@@ -613,7 +624,6 @@ void doCueFile(void) {
 int checkGaps(FILE *fdBinFile, tTrack tracks[], int nTracks) {
    int i, k;
    unsigned long int j;
-   unsigned char buf[SIZERAW];
    int c = 0;
    int writegap = 0;
    short value;
@@ -683,11 +693,12 @@ int   main(int argc, char **argv) {
    sOutFilename[0] = '\0';
 
    /* Tell them what I am. */
-   printf ("\n%s, %s", __DATE__, __TIME__);
-   printf ("\nbin2iso V1.9bm - Converts RAW format (.bin) files to ISO/WAV format"); 
-   printf ("\n               Bob Doiron, ICQ#280251                     \n");
-   printf ("\n               Michael Ortmann\n");
-   printf ("\nCheck for updates at http://users.andara.com/~doiron\n\n");
+   printf("\n%s, %s\n"
+          "bin2iso V1.9bm - Converts RAW format (.bin) files to ISO/WAV format\n"
+          "MIT License\n"
+          "(c) 1999 Bob Doiron\n"
+          "(c) 2020 Michael Ortmann\n", __DATE__, __TIME__
+         );
    if(argc < 2) {
       printf("Usage: bin2iso <cuefile> [<output dir>] [-[a]wg] [-t XX] [-i] [-nob]\n");
       printf("or   : bin2iso <cuefile> -c <binfile>\n");
@@ -938,6 +949,20 @@ int   main(int argc, char **argv) {
 
       printf("\n");
       for(i = 0; i <= nTracks-1; i++) {
+#ifdef __DOS__
+         printf("%s (%3d Mb) - sectors %06ld:", 
+            tracks[i].name, 
+            tracks[i].size/(1024l*1024l), 
+            tracks[i].idx1
+         ); 
+         printf("%06ld (offset %09ld:",
+            ( ((writegap == 0) || (tracks[i].mode != AUDIO)) ? tracks[i+1].idx0 : tracks[i+1].idx1)-1, 
+            tracks[i].offset1 
+         );
+         printf("%09ld)\n",
+            ( ((writegap == 0) || (tracks[i].mode != AUDIO)) ? tracks[i+1].offset0 : tracks[i+1].offset1)-1
+         );
+#else
          printf("%s (%3d Mb) - sectors %06ld:%06ld (offset %09ld:%09ld)\n", 
             tracks[i].name, 
             tracks[i].size/(1024*1024), 
@@ -946,6 +971,7 @@ int   main(int argc, char **argv) {
             tracks[i].offset1, 
             ( ((writegap == 0) || (tracks[i].mode != AUDIO)) ? tracks[i+1].offset0 : tracks[i+1].offset1)-1 
          );
+#endif
       }
       printf("\n");
 
