@@ -65,6 +65,7 @@ and I'll fix it up.
 Revision History 
 
 v1.9bm
+ - Fixed a bug
  - Fixed 2 compiler warnings with linux / glibc / gcc
 
 v1.9b

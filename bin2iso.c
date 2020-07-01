@@ -129,7 +129,8 @@ int buffered_fread(unsigned char *array, unsigned int size) {
       array[i] = INBUF[INBUF_RIDX++];
       if((INBUF_RIDX == INBUF_WIDX) && (i < (size -1))) {
          printf("   Warning: Premature EOF\n");
-         while(i++ < size) { array[i] == 0; }/* zero fill the rest */
+         while(i++ < size)
+           array[i] = 0; /* zero fill the rest */
          break;
       }
    }
