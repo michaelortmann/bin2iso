@@ -45,7 +45,7 @@ License:
 
   MIT License
   Copyright (c) 1999 Bob Doiron
-  Copyright (c) 2020 Michael Ortmann
+  Copyright (c) 2020 - 2021 Michael Ortmann
 
 Website:
 
@@ -64,7 +64,7 @@ Michael
 ---------------------------------------------------------------------
 NOTE: This is a work in progress!
 
-So far I beleive it handles MODE1, MODE2 and AUDIO tracks.
+So far I believe it handles MODE1, MODE2 and AUDIO tracks.
 
 Since I have little exposure to .bin files, and little expertise in 
 CD formats, I can't guarantee this will work for all .bin's.
@@ -80,6 +80,9 @@ If you do run into trouble, send me the following info:
 and I'll fix it up.
 
 Revision History 
+
+v1.9bm2
+ - Typo fixes
 
 v1.9bm
  - Ported to DOS
@@ -106,7 +109,7 @@ v1.9
    a sector of non-zero values.
  - Added a -nob option that ditches overburn data. I haven't tested this,
    but rumour has it that some cd players can't access data over 74.XX 
-   minutes. I'm not sure if I beleive this, but I put the option in in
+   minutes. I'm not sure if I believe this, but I put the option in in
    case I get a chance to try it. (so far untested!)
 
 v1.8b
@@ -144,7 +147,7 @@ v1.5
  - Verifies data tracks (checks the mode and frame sequence)
 
 v1.4
- - fixed bug that occured when tracks had no pregap index
+ - fixed bug that occurred when tracks had no pregap index
  - parsing of .bin filename out of .cue file now ditches path info
  - fixed bugs in [<output dir>] parsing. (trailing '\' or ':')
 

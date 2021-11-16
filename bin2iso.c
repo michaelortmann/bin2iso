@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT */
-/* Copyright (c) 1999 Bob Doiron, 2020 Michael Ortmann */
+/* Copyright (c) 1999 Bob Doiron, 2020 - 2021 Michael Ortmann */
 
 #include <errno.h>
 #include <stdio.h>
@@ -513,7 +513,7 @@ void dotrack(short mode, long preidx, long startidx, long endidx, unsigned long 
 #endif
                break;
             default:
-               printf("Unkown Mode\n"); exit(1);
+               printf("Unknown Mode\n"); exit(1);
                break;
          }         
             
@@ -657,7 +657,7 @@ int checkGaps(FILE *fdBinFile, tTrack tracks[], int nTracks) {
          if(count != 0) {
             printf("   Track%02d - %d values of Non-Zero gap data encountered\n", i-1, count);
             if((count > SIZERAW/2/2) && (writegap == 0)) {
-               printf("   -->Threashold reached\n"); writegap = 1;
+               printf("   -->Threshold reached\n"); writegap = 1;
             }
          }
       }
@@ -694,10 +694,10 @@ int   main(int argc, char **argv) {
 
    /* Tell them what I am. */
    printf("\n%s, %s\n"
-          "bin2iso V1.9bm - Converts RAW format (.bin) files to ISO/WAV format\n"
+          "bin2iso V1.9bm2 - Converts RAW format (.bin) files to ISO/WAV format\n"
           "MIT License\n"
           "(c) 1999 Bob Doiron\n"
-          "(c) 2020 Michael Ortmann\n", __DATE__, __TIME__
+          "(c) 2020 - 2021 Michael Ortmann\n", __DATE__, __TIME__
          );
    if(argc < 2) {
       printf("Usage: bin2iso <cuefile> [<output dir>] [-[a]wg] [-t XX] [-i] [-nob]\n");
