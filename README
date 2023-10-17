@@ -13,7 +13,7 @@ Make:
 
   DOS:
 
-    wcl bin2iso.c fe=bin2iso.exe -k12288 -os
+    wcl bin2iso.c -fe=bin2iso.exe -k12288 -os
 
 Usage:
 
@@ -82,6 +82,7 @@ and I'll fix it up.
 Revision History 
 
 v1.9bm3
+ - Fixed make DOS wcl command
  - Fixed off-by-one error
 
 v1.9bm2
