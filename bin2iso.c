@@ -624,7 +624,6 @@ void doCueFile(void) {
 int checkGaps(FILE *fdBinFile, tTrack tracks[], int nTracks) {
    int i, k;
    unsigned long int j;
-   int c = 0;
    int writegap = 0;
    short value;
    int count;
@@ -667,8 +666,7 @@ int checkGaps(FILE *fdBinFile, tTrack tracks[], int nTracks) {
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
 
-int   main(int argc, char **argv) {
-   unsigned long int count = 0;
+int main(int argc, char **argv) {
 //   int printon = 0;
 
    char sLine[256];
@@ -1047,6 +1045,3 @@ int   main(int argc, char **argv) {
    fclose(fdBinFile);
    return(0);  
 }
-
-
-
