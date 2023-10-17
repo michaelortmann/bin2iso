@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT */
-/* Copyright (c) 1999 Bob Doiron, 2020 - 2021 Michael Ortmann */
+/* Copyright (c) 1999 Bob Doiron, 2020 - 2023 Michael Ortmann */
 
 #include <errno.h>
 #include <stdio.h>
@@ -551,7 +551,7 @@ void doCueFile(void) {
    int gapon = 0;
    short value;
       
-   char mode[12] = "AUDIO";
+   char mode[13] = "AUDIO";
    char index0[9] = "00:00:00";
    char index1[9] = "00:00:00";
 
@@ -694,36 +694,37 @@ int   main(int argc, char **argv) {
 
    /* Tell them what I am. */
    printf("\n%s, %s\n"
-          "bin2iso V1.9bm2 - Converts RAW format (.bin) files to ISO/WAV format\n"
+          "bin2iso V1.9bm3 - Converts RAW format (.bin) files to ISO/WAV format\n"
           "MIT License\n"
           "(c) 1999 Bob Doiron\n"
-          "(c) 2020 - 2021 Michael Ortmann\n", __DATE__, __TIME__
+          "(c) 2020 - 2023 Michael Ortmann\n", __DATE__, __TIME__
          );
    if(argc < 2) {
-      printf("Usage: bin2iso <cuefile> [<output dir>] [-[a]wg] [-t XX] [-i] [-nob]\n");
-      printf("or   : bin2iso <cuefile> -c <binfile>\n");
-      printf("\n");
-      printf("Where:\n");
-      printf("   <cuefile>    - the .cue file that belongs to the .bin file to \n");
-      printf("                  be converted\n");
-      printf("   <output dir> - the output directory (defaults to current dir) \n");
-      printf("   -nwg         - indicates that audio data found in the track   \n");
-      printf("                  'gaps' shouldn't be appended to the audio tracks\n");
-      printf("   -awg         - looks for non-zero data in the 'gaps', if found\n");
-      printf("                  then gaps are appended to audio tracks. Looks  \n");
-      printf("                  for more than 1/2 of a sector of non-zero values\n");
-      printf("                  (%d values),                                   \n", SIZERAW/2/2);
-      printf("   -t XX        - Extracts the XX'th track.                      \n");
-      printf("   -i           - Performs the conversion 'in place'. Meaning it \n");
-      printf("                  truncates the binfile after each track is      \n");
-      printf("                  created to minimize diskspace requirements.    \n");
-      printf("                  [not valid with -t]                            \n");
-      printf("   -nob         - Doesn't use overburn data past %ld sectors.    \n", CD74_MAX_SECTORS);
-      printf("                  This of course presumes that the data is not   \n");
-      printf("                  useful.                                        \n");
-      printf("   -c           - Attempts to create a <cuefile> from an existing\n");
-      printf("                  <binfile>                                      \n");
-      exit (1);
+      printf("Usage: bin2iso <cuefile> [<output dir>] [-[a]wg] [-t XX] [-i] [-nob]\n"
+             "or   : bin2iso <cuefile> -c <binfile>\n"
+             "\n"
+             "Where:\n"
+             "   <cuefile>    - the .cue file that belongs to the .bin file to\n"
+             "                  be converted\n"
+             "   <output dir> - the output directory (defaults to current dir)\n"
+             "   -nwg         - indicates that audio data found in the track\n"
+             "                  'gaps' shouldn't be appended to the audio tracks\n"
+             "   -awg         - looks for non-zero data in the 'gaps', if found\n"
+             "                  then gaps are appended to audio tracks. Looks\n"
+             "                  for more than 1/2 of a sector of non-zero values\n"
+             "                  (%d values),\n"
+             "   -t XX        - Extracts the XX'th track.\n"
+             "   -i           - Performs the conversion 'in place'. Meaning it\n"
+             "                  truncates the binfile after each track is\n"
+             "                  created to minimize diskspace requirements.\n"
+             "                  [not valid with -t]\n"
+             "   -nob         - Doesn't use overburn data past %ld sectors.\n"
+             "                  This of course presumes that the data is not\n"
+             "                  useful.\n"
+             "   -c           - Attempts to create a <cuefile> from an existing\n"
+             "                  <binfile>\n", SIZERAW/2/2, CD74_MAX_SECTORS
+            );
+      exit(1);
    }
 
    strcpy(sOutdir, "./"); // default path

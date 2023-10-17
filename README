@@ -45,7 +45,7 @@ License:
 
   MIT License
   Copyright (c) 1999 Bob Doiron
-  Copyright (c) 2020 - 2021 Michael Ortmann
+  Copyright (c) 2020 - 2023 Michael Ortmann
 
 Website:
 
@@ -80,6 +80,9 @@ If you do run into trouble, send me the following info:
 and I'll fix it up.
 
 Revision History 
+
+v1.9bm3
+ - Fixed off-by-one error
 
 v1.9bm2
  - Typo fixes
