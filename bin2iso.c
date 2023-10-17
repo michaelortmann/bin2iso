@@ -690,8 +690,6 @@ int   main(int argc, char **argv) {
    
    char sOutdir[192];
 
-   sOutFilename[0] = '\0';
-
    /* Tell them what I am. */
    printf("\n%s, %s\n"
           "bin2iso V1.9bm3 - Converts RAW format (.bin) files to ISO/WAV format\n"
@@ -704,28 +702,25 @@ int   main(int argc, char **argv) {
              "or   : bin2iso <cuefile> -c <binfile>\n"
              "\n"
              "Where:\n"
-             "   <cuefile>    - the .cue file that belongs to the .bin file to\n"
-             "                  be converted\n"
-             "   <output dir> - the output directory (defaults to current dir)\n"
-             "   -nwg         - indicates that audio data found in the track\n"
-             "                  'gaps' shouldn't be appended to the audio tracks\n"
-             "   -awg         - looks for non-zero data in the 'gaps', if found\n"
-             "                  then gaps are appended to audio tracks. Looks\n"
-             "                  for more than 1/2 of a sector of non-zero values\n"
-             "                  (%d values),\n"
+             "   <cuefile>    - The .cue file that belongs to the .bin file to be converted\n"
+             "   <output dir> - The output directory (defaults to current dir)\n"
+             "   -nwg         - Indicates that audio data found in the track 'gaps'\n"
+             "                  shouldn't be appended to the audio tracks\n"
+             "   -awg         - Looks for non-zero data in the 'gaps', if found then gaps\n"
+             "                  are appended to audio tracks. Looks for more than 1/2 of a\n"
+             "                  sector of non-zero values (%d values).\n"
              "   -t XX        - Extracts the XX'th track.\n"
-             "   -i           - Performs the conversion 'in place'. Meaning it\n"
-             "                  truncates the binfile after each track is\n"
-             "                  created to minimize diskspace requirements.\n"
-             "                  [not valid with -t]\n"
+             "   -i           - Performs the conversion 'in place'. Meaning it truncates the\n"
+             "                  binfile after each track is created to minimize diskspace\n"
+             "                  requirements.\n"
              "   -nob         - Doesn't use overburn data past %ld sectors.\n"
-             "                  This of course presumes that the data is not\n"
-             "                  useful.\n"
-             "   -c           - Attempts to create a <cuefile> from an existing\n"
-             "                  <binfile>\n", SIZERAW/2/2, CD74_MAX_SECTORS
+             "                  This of course presumes that the data is not useful.\n"
+             "   -c           - Attempts to create a <cuefile> from an existing <binfile>\n", SIZERAW/2/2, CD74_MAX_SECTORS
             );
       exit(1);
    }
+
+   sOutFilename[0] = '\0';
 
    strcpy(sOutdir, "./"); // default path
 

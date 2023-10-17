@@ -82,6 +82,7 @@ and I'll fix it up.
 Revision History 
 
 v1.9bm3
+ - Fixed usage output
  - Fixed make DOS wcl command
  - Fixed off-by-one error
 
