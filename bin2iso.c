@@ -289,7 +289,7 @@ static int getTrackinfo(char *Line, tTrack *track)
    } else if(track->mode == AUDIO) {
       strcat(track->name, ".wav");
    } else {
-      printf("Track %d Unsupported mode\n", track->num);
+      printf("Track %s Unsupported mode\n", track->num);
       return(1);
    }
 
@@ -351,7 +351,7 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
    
    uiLastIndex = startidx-1;
    // Input -- process -- Output 
-   if(startidx != 0) printf("\nNote: PreGap = %d frames\n", startidx-preidx);
+   if(startidx != 0) printf("\nNote: PreGap = %ld frames\n", startidx-preidx);
    else printf("\nNote: PreGap = %d frames\n", OFFSET); // cd standard: starting offset
                                                        // - of course this isn't true for bootable cd's...
 
@@ -711,7 +711,7 @@ int main(int argc, char **argv) {
              "   -i           - Performs the conversion 'in place'. Meaning it truncates the\n"
              "                  binfile after each track is created to minimize diskspace\n"
              "                  requirements.\n"
-             "   -nob         - Doesn't use overburn data past %ld sectors.\n"
+             "   -nob         - Doesn't use overburn data past %d sectors.\n"
              "                  This of course presumes that the data is not useful.\n"
              "   -c           - Attempts to create a <cuefile> from an existing <binfile>\n", SIZERAW/2/2, CD74_MAX_SECTORS
             );
@@ -808,7 +808,7 @@ int main(int argc, char **argv) {
 //         strlwr(sBinFilename);
 
       } else {
-         printf ("Error: Filename not found on first line of cuefile.\n", argv[1]);
+         printf ("Error: Filename not found on first line of cuefile %s.\n", argv[1]);
          exit (1);
       }
    
@@ -957,7 +957,7 @@ int main(int argc, char **argv) {
             ( ((writegap == 0) || (tracks[i].mode != AUDIO)) ? tracks[i+1].offset0 : tracks[i+1].offset1)-1
          );
 #else
-         printf("%s (%3d Mb) - sectors %06ld:%06ld (offset %09ld:%09ld)\n", 
+         printf("%s (%3lu Mb) - sectors %06ld:%06ld (offset %09ld:%09ld)\n",
             tracks[i].name, 
             tracks[i].size/(1024*1024), 
             tracks[i].idx1, 

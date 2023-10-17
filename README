@@ -82,6 +82,8 @@ and I'll fix it up.
 Revision History 
 
 v1.9bm3
+ - Fixed data argument not used by format string
+ - Fixed format specifier
  - Made functions static
  - Removed defined, but not referenced variables
  - Fixed usage output
