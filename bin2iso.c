@@ -65,7 +65,7 @@ typedef struct wavHdr {
 #define CD74_MAX_SECTORS 334873 // 653.75 Mb 
          
 
-unsigned long int Index(char m, char s, char f)
+static unsigned long int Index(char m, char s, char f)
 {
   unsigned long int temp;
 
@@ -79,7 +79,7 @@ unsigned long int Index(char m, char s, char f)
   return temp;
 }
 
-void unIndex(unsigned long int index, char *ptr)
+static void unIndex(unsigned long int index, char *ptr)
 {
   char m, s, f;
 
@@ -128,7 +128,7 @@ typedef struct track
    unsigned long size; /* track size in bytes */
 } tTrack;
 
-int buffered_fread(unsigned char *array, unsigned int size) {
+static int buffered_fread(unsigned char *array, unsigned int size) {
    unsigned int i;
    
    if(INBUF_WIDX == 0) {    
@@ -158,7 +158,7 @@ int buffered_fread(unsigned char *array, unsigned int size) {
      
 }
 
-void buffered_fwrite(unsigned char *array, unsigned int size) {
+static void buffered_fwrite(unsigned char *array, unsigned int size) {
    unsigned int idx;
    unsigned long int readpos;
      
@@ -205,7 +205,7 @@ void buffered_fwrite(unsigned char *array, unsigned int size) {
 }
 
 
-void flush_buffers(void)
+static void flush_buffers(void)
 {
    unsigned long int readpos;
 
@@ -241,7 +241,7 @@ void flush_buffers(void)
 
 
 // presumes Line is preloaded with the "current" line of the file
-int getTrackinfo(char *Line, tTrack *track)
+static int getTrackinfo(char *Line, tTrack *track)
 {
 //   char tnum[3];
    char inum[3];
@@ -325,7 +325,7 @@ int getTrackinfo(char *Line, tTrack *track)
 } 
 
 
-void dotrack(short mode, long preidx, long startidx, long endidx, unsigned long offset) 
+static void dotrack(short mode, long preidx, long startidx, long endidx, unsigned long offset) 
 {
    unsigned long blockswritten = 0;
    unsigned int uiLastIndex;
@@ -540,7 +540,7 @@ void dotrack(short mode, long preidx, long startidx, long endidx, unsigned long 
 }
 
 
-void doCueFile(void) {
+static void doCueFile(void) {
    int track = 1;
    unsigned long int binIndex = 0;
    unsigned long int trackIndex = 0;
@@ -621,7 +621,7 @@ void doCueFile(void) {
 }
 
 // return 0 to when no data found, 1 when there is.
-int checkGaps(FILE *fdBinFile, tTrack tracks[], int nTracks) {
+static int checkGaps(FILE *fdBinFile, tTrack tracks[], int nTracks) {
    int i, k;
    unsigned long int j;
    int writegap = 0;
