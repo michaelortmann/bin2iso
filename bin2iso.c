@@ -1,10 +1,9 @@
 /* SPDX-License-Identifier: MIT */
 /* Copyright (c) 1999 Bob Doiron, 2020 - 2023 Michael Ortmann */
 
-#include <errno.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef __DOS__
   #include <io.h>
