@@ -304,9 +304,9 @@ static int getTrackinfo(char *Line, tTrack *track)
       if (strncmp(&Line[4], "INDEX ", 6)==0) 
       {
          strncpy(inum, &Line[10], 2); inum[2] = '\0';
-         min = ((Line[13]-'0')<<4) | Line[14]-'0';
-         sec = ((Line[16]-'0')<<4) | Line[17]-'0';
-         block = ((Line[19]-'0')<<4) | Line[20]-'0';
+         min = ((Line[13]-'0')<<4) | (Line[14]-'0');
+         sec = ((Line[16]-'0')<<4) | (Line[17]-'0');
+         block = ((Line[19]-'0')<<4) | (Line[20]-'0');
          
          
          if(strcmp(inum, "00")==0) track->idx0 = Index(min, sec, block);
