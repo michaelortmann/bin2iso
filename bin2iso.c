@@ -41,7 +41,6 @@ typedef struct wavHdr {
 //-------------------------------------------------/
 
 /*  G L O B A L   D E F I N E S  */
-#define byte    unsigned char
 #define SIZERAW 2352
 #define SIZEISO_MODE1 2048
 #define SIZEISO_MODE2_RAW 2352
