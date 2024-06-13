@@ -60,7 +60,7 @@ License:
 
   MIT License
   Copyright (c) 1999 Bob Doiron
-  Copyright (c) 2020 - 2023 Michael Ortmann
+  Copyright (c) 2020 - 2024 Michael Ortmann
 
 Website:
 
@@ -97,6 +97,11 @@ If you do run into trouble, send me the following info:
 and I'll fix it up.
 
 Revision History 
+
+v1.9bm4
+ - Fix https://github.com/michaelortmann/bin2iso/issues/3
+   Only suffix track name with track number if number of tracks is greater than 1
+ - Remove trailing whitespaces
 
 v1.9bm3
  - Added win32 and win64 executable

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT */
-/* Copyright (c) 1999 Bob Doiron, 2020 - 2023 Michael Ortmann */
+/* Copyright (c) 1999 Bob Doiron, 2020 - 2024 Michael Ortmann */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,7 +27,7 @@ typedef struct wavHdr {
    BYTE1 fmttxt[4];
    BYTE4 formatsize;  // 16 byte format specifier
    BYTE2 format;          // Windows PCM
-   BYTE2 channels;             // 2 channels 
+   BYTE2 channels;             // 2 channels
    BYTE4 samplerate;       // 44,100 Samples/sec
    BYTE4 avgbyterate;     // 176,400 Bytes/sec
    BYTE2 samplebytes;          // 4 bytes/sample
@@ -58,10 +58,10 @@ typedef struct wavHdr {
 
 #define PROG_INTERVAL 1024
 #define UNKNOWN -1
-#define OFFSET 150                    
+#define OFFSET 150
 // got this from easycd pro by looking at a blank disk so it may be off...
-#define CD74_MAX_SECTORS 334873 // 653.75 Mb 
-         
+#define CD74_MAX_SECTORS 334873 // 653.75 Mb
+
 
 static unsigned long int Index(char m, char s, char f)
 {
@@ -71,9 +71,9 @@ static unsigned long int Index(char m, char s, char f)
   temp =  (((m>>4)*10) + (m&0xf)) * 60;
   temp = ( temp + (((s>>4)*10) + (s&0xf))) * 75;
   temp =  temp + (((f>>4)*10) + (f&0xf));
-  
+
 //  printf("\n%d%d %d%d %d%d = %06d", m>>4, m&f, s>>4, s&f, f>>4, f&f, temp);
-  
+
   return temp;
 }
 
@@ -105,9 +105,9 @@ unsigned long int writepos = 0; // for inplace conversions...
   #define OUTBUF_SIZE 4*1024*1024
   #define INBUF_SIZE 4*1024*1024
 #endif
-unsigned char OUTBUF[OUTBUF_SIZE]; 
+unsigned char OUTBUF[OUTBUF_SIZE];
 unsigned int OUTBUF_IDX = 0;
-unsigned char INBUF[INBUF_SIZE]; 
+unsigned char INBUF[INBUF_SIZE];
 unsigned int INBUF_RIDX = 0;
 unsigned int INBUF_WIDX = 0;
 unsigned char buf[SIZERAW + 100];
@@ -128,13 +128,13 @@ typedef struct track
 
 static int buffered_fread(unsigned char *array, unsigned int size) {
    unsigned int i;
-   
-   if(INBUF_WIDX == 0) {    
+
+   if(INBUF_WIDX == 0) {
       INBUF_WIDX += fread( INBUF, 1, (INBUF_SIZE/size)*size, fdBinFile );
    }
    if(INBUF_WIDX == 0) return 0; // read failed.
-   
-   for(i = 0; i< size; i++) 
+
+   for(i = 0; i< size; i++)
    {
 
       array[i] = INBUF[INBUF_RIDX++];
@@ -147,26 +147,26 @@ static int buffered_fread(unsigned char *array, unsigned int size) {
    }
 
    if(INBUF_RIDX == INBUF_WIDX) {
-      INBUF_RIDX = 0;   
-      INBUF_WIDX = 0;   
+      INBUF_RIDX = 0;
+      INBUF_WIDX = 0;
    }
 
 
    return 1; // read passed
-     
+
 }
 
 static void buffered_fwrite(unsigned char *array, unsigned int size) {
    unsigned int idx;
    unsigned long int readpos;
-     
-   if(OUTBUF_IDX+size >= OUTBUF_SIZE) {     
+
+   if(OUTBUF_IDX+size >= OUTBUF_SIZE) {
 
       if(fdOutFile == fdBinFile) {
          readpos = ftell(fdOutFile);
-         if(0 != fseek(fdOutFile, writepos, SEEK_SET)) { 
+         if(0 != fseek(fdOutFile, writepos, SEEK_SET)) {
             perror("\nbin2iso(fseek)"); exit(1);
-         }         
+         }
       }
 
       //      printf("\nWriting            \n");
@@ -187,9 +187,9 @@ static void buffered_fwrite(unsigned char *array, unsigned int size) {
 
       if(fdOutFile == fdBinFile) {
          writepos = ftell(fdOutFile);
-         if(0 != fseek(fdOutFile, readpos, SEEK_SET)) { 
+         if(0 != fseek(fdOutFile, readpos, SEEK_SET)) {
             perror("\nbin2iso(fseek)"); exit(1);
-         }         
+         }
      }
 
 
@@ -199,7 +199,7 @@ static void buffered_fwrite(unsigned char *array, unsigned int size) {
       }
       OUTBUF_IDX+=size;
    }
-     
+
 }
 
 
@@ -209,9 +209,9 @@ static void flush_buffers(void)
 
    if(fdOutFile == fdBinFile) {
       readpos = ftell(fdOutFile);
-      if(0 != fseek(fdOutFile, writepos, SEEK_SET)) { 
+      if(0 != fseek(fdOutFile, writepos, SEEK_SET)) {
          perror("\nbin2iso(fseek)"); exit(1);
-      }         
+      }
    }
 
    if( 1 != fwrite( OUTBUF, OUTBUF_IDX, 1, fdOutFile )) {
@@ -228,9 +228,9 @@ static void flush_buffers(void)
 
    if(fdOutFile == fdBinFile) {
       writepos = ftell(fdOutFile);
-      if(0 != fseek(fdOutFile, readpos, SEEK_SET)) { 
+      if(0 != fseek(fdOutFile, readpos, SEEK_SET)) {
          perror("\nbin2iso(fseek)"); exit(1);
-      }         
+      }
    }
 
 
@@ -239,19 +239,19 @@ static void flush_buffers(void)
 
 
 // presumes Line is preloaded with the "current" line of the file
-static int getTrackinfo(char *Line, tTrack *track)
+static void getTrackinfo(char *Line, tTrack *track)
 {
 //   char tnum[3];
    char inum[3];
    char min;
    char sec;
    char block;
-   
+
    track->idx0 = -1;
    track->idx1 = -1;
-   
+
    // Get the 'mode'
-   if (strncmp(&Line[2], "TRACK ", 6)==0) 
+   if (strncmp(&Line[2], "TRACK ", 6)==0)
    {
       if (Line[8] < '0' || Line[8] > '9' || Line[9] < '0' || Line[9] > '9') {
         printf("Error: Track # is not a 2 digit number\n");
@@ -271,47 +271,37 @@ static int getTrackinfo(char *Line, tTrack *track)
       printf("Error: 2nd line does not begin with '  TRACK '\n");
       exit(1);
    }
-   
-   // Set the name
-   strcpy(track->name, sBinFilename);
-   track->name[strlen(sBinFilename)-4] = '\0';
-   strcat(track->name, "-");
-   strcat(track->name, track->num);
 
-   if( (track->mode == MODE1_2352) || 
-       (track->mode == MODE1_2048) || 
-       (track->mode == MODE2_2352) || 
-       (track->mode == MODE2_2336)    )
-   {
-      strcat(track->name, ".iso");
-   } else if(track->mode == AUDIO) {
-      strcat(track->name, ".wav");
-   } else {
+   if( (track->mode != MODE1_2352) &&
+       (track->mode != MODE1_2048) &&
+       (track->mode != MODE2_2352) &&
+       (track->mode != MODE2_2336) &&
+       (track->mode != AUDIO)         ) {
       printf("Track %s Unsupported mode\n", track->num);
-      return(1);
+      return;
    }
 
    // Get the track indexes
    while(1) {
       if(! fgets( Line, 256, fdCueFile ) ) { break; }
 
-      if (strncmp(&Line[2], "TRACK ", 6)==0) 
-      {  
+      if (strncmp(&Line[2], "TRACK ", 6)==0)
+      {
          break; // next track starting
       }
 
-      if (strncmp(&Line[4], "INDEX ", 6)==0) 
+      if (strncmp(&Line[4], "INDEX ", 6)==0)
       {
          strncpy(inum, &Line[10], 2); inum[2] = '\0';
          min = ((Line[13]-'0')<<4) | (Line[14]-'0');
          sec = ((Line[16]-'0')<<4) | (Line[17]-'0');
          block = ((Line[19]-'0')<<4) | (Line[20]-'0');
-         
-         
+
+
          if(strcmp(inum, "00")==0) track->idx0 = Index(min, sec, block);
          else if(strcmp(inum, "01")==0) track->idx1 = Index(min, sec, block);
-         else { printf("Unexpected Index number: %s\n", inum); exit(1); } 
-           
+         else { printf("Unexpected Index number: %s\n", inum); exit(1); }
+
       }
       else if (strncmp(&Line[4], "PREGAP ", 7)==0) { ; /* ignore, handled below */ }
       else if (strncmp(&Line[4], "FLAGS ", 6)==0)  { ; /* ignore */ }
@@ -319,11 +309,33 @@ static int getTrackinfo(char *Line, tTrack *track)
    }
    if(track->idx0 == -1) track->idx0 = track->idx1;
    if(track->idx1 == -1) track->idx1 = track->idx0;
-   return(0);
-} 
+}
 
 
-static void dotrack(short mode, long preidx, long startidx, long endidx, unsigned long offset) 
+static void set_track_names(tTrack tracks[], int nTracks) {
+   int i;
+
+   for (i = 0; i < nTracks; i++) {
+      strcpy(tracks[i].name, sBinFilename);
+      tracks[i].name[strlen(sBinFilename)-4] = '\0';
+      if (nTracks > 1) {
+         strcat(tracks[i].name, "-");
+         strcat(tracks[i].name, tracks[i].num);
+      }
+      if( (tracks[i].mode == MODE1_2352) ||
+          (tracks[i].mode == MODE1_2048) ||
+          (tracks[i].mode == MODE2_2352) ||
+          (tracks[i].mode == MODE2_2336)    )
+      {
+         strcat(tracks[i].name, ".iso");
+      } else if(tracks[i].mode == AUDIO) {
+         strcat(tracks[i].name, ".wav");
+      }
+   }
+}
+
+
+static void dotrack(short mode, long preidx, long startidx, long endidx, unsigned long offset)
 {
    unsigned long blockswritten = 0;
    unsigned int uiLastIndex;
@@ -331,24 +343,24 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
    unsigned int uiCurrentIndex;
 #endif
    unsigned int write = 1;
-   
-   tWavHead wavhead = { "RIFF", 
-                             0,      
-                        "WAVE", 
-                        "fmt ", 
+
+   tWavHead wavhead = { "RIFF",
+                             0,
+                        "WAVE",
+                        "fmt ",
                             16,       // 16 byte format specifier
                    WINDOWS_PCM,       // format
-                             2,       // 2 Channels 
-                         44100,       // 44,100 Samples/sec    
+                             2,       // 2 Channels
+                         44100,       // 44,100 Samples/sec
                         176400,       // 176,400 Bytes/sec
                              4,       // 4 bytes/sample
                             16,       // 16 bits/channel
-                        "data",  
+                        "data",
                              0 };
-                             
-   
+
+
    uiLastIndex = startidx-1;
-   // Input -- process -- Output 
+   // Input -- process -- Output
    if(startidx != 0) printf("\nNote: PreGap = %ld frames\n", startidx-preidx);
    else printf("\nNote: PreGap = %d frames\n", OFFSET); // cd standard: starting offset
                                                        // - of course this isn't true for bootable cd's...
@@ -362,7 +374,7 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
    {
       case AUDIO:
          printf("Audio");
-         break;            
+         break;
       case MODE1_2352:
          printf("Mode1/2048");
          break;
@@ -370,9 +382,9 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
          printf("Mode2/2352");
          break;
       case MODE2_2352:
-         if(mode2to1 != 1) 
+         if(mode2to1 != 1)
             printf("Mode2/2352");
-         else 
+         else
             printf("Mode1/2048");
          break;
       case MODE1_2048:
@@ -383,7 +395,7 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
            exit(1);
    }
    printf(" :       ");
-   
+
    if(sOutFilename[0] != '\0') {
       if(NULL == (fdOutFile = fopen (sOutFilename, "wb"))) {
          perror("bin2iso(fopen)");
@@ -394,10 +406,10 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
       fdOutFile = fdBinFile;
    }
    if (fdOutFile == NULL)   { printf ("    Unable to create %s\n", sOutFilename); exit (1); }
-   
-   if(0 != fseek(fdBinFile, offset, SEEK_SET)) { 
+
+   if(0 != fseek(fdBinFile, offset, SEEK_SET)) {
       perror("\nbin2iso(fseek)"); exit(1);
-   }         
+   }
 
 #if (DEBUG == 0)
    if(mode == AUDIO) {
@@ -408,8 +420,8 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
          exit(1);
       }
    }
-#endif 
-         
+#endif
+
    memset( &buf[0], '\0', sizeof( buf ) );
    if(mode == MODE2_2336) {
       unsigned int M = 0, S = 2, F = 0;
@@ -422,25 +434,25 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
          buf[13] = S;
          buf[14] = F;
          buf[15] = MODE2;
-         
+
          if((++F&0xF) == 0xA) F += 6;
 
-         if(F == 0x75) { S++; F = 0; } 
+         if(F == 0x75) { S++; F = 0; }
          if((S&0xF) == 0xA) S += 6;
-  
+
          if(S == 0x60) { M++; S = 0; }
          if((M&0xF) == 0xA) M += 6;
 //         printf("\n%x:%x:%x", M, S, F);
-         
-         buffered_fwrite( buf, SIZERAW );   
+
+         buffered_fwrite( buf, SIZERAW );
          uiLastIndex++;
          memset( &buf[0], '\0', sizeof( buf ) );
          if (startidx%PROG_INTERVAL == 0) { printf("\b\b\b\b\b\b%06ld", startidx); }
          if (++startidx == endidx) { printf("\b\b\b\b\b\bComplete\n"); break; }
       }
    } else if (mode == MODE1_2048) {
-      while( buffered_fread( buf, SIZEISO_MODE1) ) {         
-         buffered_fwrite( buf, SIZEISO_MODE1 );   
+      while( buffered_fread( buf, SIZEISO_MODE1) ) {
+         buffered_fwrite( buf, SIZEISO_MODE1 );
          uiLastIndex++;
          if (startidx%PROG_INTERVAL == 0) { printf("\b\b\b\b\b\b%06ld", startidx); }
          if (++startidx == endidx) { printf("\b\b\b\b\b\bComplete\n"); break; }
@@ -451,29 +463,29 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
             case AUDIO:
 #if (DEBUG == 0)
                buffered_fwrite( buf, SIZERAW );
-#endif        
+#endif
                uiLastIndex++;
                blockswritten++;
                break;
             case MODE1_2352:
                // should put a crc check in here...
 #if CHECK
-               if( buf[15] != MODE1) 
-               { 
-                  printf("\nWarning: Mode Error in bin file!\n"); 
-                  printf("   %02x:%02x:%02x : mode %02x\n", buf[12], buf[13], buf[14], buf[15] ); 
+               if( buf[15] != MODE1)
+               {
+                  printf("\nWarning: Mode Error in bin file!\n");
+                  printf("   %02x:%02x:%02x : mode %02x\n", buf[12], buf[13], buf[14], buf[15] );
                   //exit(1);
                }
-             
+
                uiCurrentIndex = Index(buf[12], buf[13], buf[14]) - OFFSET;
-              
+
                if(uiCurrentIndex != uiLastIndex+1)
-               { 
-                  printf("\nWarning: Frame Error in bin file!\n"); 
-                  printf("Last      %02d:%02d:%02d (%d)\n", ((uiLastIndex+OFFSET)/75)/60, ((uiLastIndex+OFFSET)/75)%60, (uiLastIndex+OFFSET)%75, uiLastIndex ); 
-                  printf("Current   %02x:%02x:%02x (%d)\n", buf[12], buf[13], buf[14], uiCurrentIndex ); 
-                  printf("Expecting %02d:%02d:%02d (%d)\n", ((uiLastIndex+OFFSET+1)/75)/60, ((uiLastIndex+OFFSET+1)/75)%60, (uiLastIndex+OFFSET+1)%75, uiLastIndex+1 ); 
-                
+               {
+                  printf("\nWarning: Frame Error in bin file!\n");
+                  printf("Last      %02d:%02d:%02d (%d)\n", ((uiLastIndex+OFFSET)/75)/60, ((uiLastIndex+OFFSET)/75)%60, (uiLastIndex+OFFSET)%75, uiLastIndex );
+                  printf("Current   %02x:%02x:%02x (%d)\n", buf[12], buf[13], buf[14], uiCurrentIndex );
+                  printf("Expecting %02d:%02d:%02d (%d)\n", ((uiLastIndex+OFFSET+1)/75)/60, ((uiLastIndex+OFFSET+1)/75)%60, (uiLastIndex+OFFSET+1)%75, uiLastIndex+1 );
+
                }
 #endif
 #if (DEBUG == 0)
@@ -485,21 +497,21 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
                break;
             case MODE2_2352:
 #if CHECK
-               if( (buf[15]&0xf) != MODE2) 
-               { 
-                  printf("\nWarning: Mode Error in bin file!\n"); 
-                  printf("   %02x:%02x:%02x : mode %02x\n", buf[12], buf[13], buf[14], buf[15] ); 
+               if( (buf[15]&0xf) != MODE2)
+               {
+                  printf("\nWarning: Mode Error in bin file!\n");
+                  printf("   %02x:%02x:%02x : mode %02x\n", buf[12], buf[13], buf[14], buf[15] );
                   //exit(1);
                }
 
                uiCurrentIndex = Index(buf[12], buf[13], buf[14]) - OFFSET;
 
                if(uiCurrentIndex != uiLastIndex+1)
-               { 
-                  printf("\nWarning: Frame Error in bin file!\n"); 
-                  printf("Last      %02d:%02d:%02d (%d)\n", ((uiLastIndex+OFFSET)/75)/60, ((uiLastIndex+OFFSET)/75)%60, (uiLastIndex+OFFSET)%75, uiLastIndex ); 
-                  printf("Current   %02x:%02x:%02x (%d)\n", buf[12], buf[13], buf[14], uiCurrentIndex ); 
-                  printf("Expecting %02d:%02d:%02d (%d)\n", ((uiLastIndex+OFFSET+1)/75)/60, ((uiLastIndex+OFFSET+1)/75)%60, (uiLastIndex+OFFSET+1)%75, uiLastIndex+1 ); 
+               {
+                  printf("\nWarning: Frame Error in bin file!\n");
+                  printf("Last      %02d:%02d:%02d (%d)\n", ((uiLastIndex+OFFSET)/75)/60, ((uiLastIndex+OFFSET)/75)%60, (uiLastIndex+OFFSET)%75, uiLastIndex );
+                  printf("Current   %02x:%02x:%02x (%d)\n", buf[12], buf[13], buf[14], uiCurrentIndex );
+                  printf("Expecting %02d:%02d:%02d (%d)\n", ((uiLastIndex+OFFSET+1)/75)/60, ((uiLastIndex+OFFSET+1)/75)%60, (uiLastIndex+OFFSET+1)%75, uiLastIndex+1 );
                }
 #endif
 #if (DEBUG == 0)
@@ -513,8 +525,8 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
             default:
                printf("Unknown Mode\n"); exit(1);
                break;
-         }         
-            
+         }
+
          memset( &buf[0], '\0', sizeof( buf ) );
          if (startidx%PROG_INTERVAL == 0) { printf("\b\b\b\b\b\b%06ld", startidx); }
          if (++startidx == endidx) { printf("\b\b\b\b\b\bComplete\n"); break; }
@@ -526,14 +538,14 @@ static void dotrack(short mode, long preidx, long startidx, long endidx, unsigne
       wavhead.blocksize = blockswritten*SIZERAW;
       wavhead.bytestoend = wavhead.blocksize + HEADBYTES;
       // rewind to the beginning
-      if(0 != fseek(fdOutFile, 0, SEEK_SET)) { 
+      if(0 != fseek(fdOutFile, 0, SEEK_SET)) {
          perror("\nbin2iso(fseek)"); exit(1);
-      }         
+      }
 
 #if (DEBUG == 0)
       fwrite( &wavhead, sizeof(wavhead), 1, fdOutFile );
 #endif
-   }      
+   }
    fclose(fdOutFile);
 }
 
@@ -548,7 +560,7 @@ static void doCueFile(void) {
    int i, blank;
    int gapon = 0;
    short value;
-      
+
    char mode[13] = "AUDIO";
    char index0[9] = "00:00:00";
    char index1[9] = "00:00:00";
@@ -569,13 +581,13 @@ static void doCueFile(void) {
               (buf[8] == 0xFF) &&
               (buf[9] == 0xFF) &&
               (buf[10] == 0xFF) &&
-              (buf[11] == 0x00) 
+              (buf[11] == 0x00)
             ) {
             sprintf(mode, "MODE%d/2352", buf[15]);
-         } else { 
-            sprintf(mode, "AUDIO"); 
+         } else {
+            sprintf(mode, "AUDIO");
          }
-      } 
+      }
       if(binIndex == 0) {
          printf(            "  TRACK %02d %s\n", track, mode);
          fprintf(fdCueFile, "  TRACK %02d %s\n", track, mode);
@@ -595,7 +607,7 @@ static void doCueFile(void) {
 //      if(i == SIZERAW) printf("%f ~blank~\n", (1.0/75)*binIndex);
       if(blank == 1) count++;
       else if (gapon == 1) {
-         gapon = 0; 
+         gapon = 0;
          unIndex(binIndex-count, index0);
          count = 0;
          unIndex(binIndex, index1);
@@ -606,14 +618,14 @@ static void doCueFile(void) {
          printf(            "    INDEX 01 %s\n", index1);
          fprintf(fdCueFile, "    INDEX 01 %s\n", index1);
       }
-      
+
       if((count > gapThreshold) && (gapon == 0)) {
          gapon = 1; track++;
          trackIndex = -1;
-      } 
-      
+      }
+
       memset( buf, '\0', sizeof( buf ) );
-      binIndex++;      
+      binIndex++;
       trackIndex++;
    }
 }
@@ -632,7 +644,7 @@ static int checkGaps(FILE *fdBinFile, tTrack tracks[], int nTracks) {
 
    for (i = 0; i < nTracks; i++) {
       if((tracks[i].offset0 != tracks[i].offset1) && (tracks[i-1].mode == AUDIO)) {
-         if(0 != fseek(fdBinFile, tracks[i].offset0, SEEK_SET)) { 
+         if(0 != fseek(fdBinFile, tracks[i].offset0, SEEK_SET)) {
             perror("\nbin2iso(fseek)"); exit(1);
          }
          count = 0;
@@ -644,7 +656,7 @@ static int checkGaps(FILE *fdBinFile, tTrack tracks[], int nTracks) {
             for(k = 0; k < SIZERAW; k+=2) {
                value = buf[k+1];
                value = ((value << 8) | buf[k]);
-               if(value != 0) { 
+               if(value != 0) {
                   count++;
 
                 // printf("%10d: %2x\n", count ,value );
@@ -659,8 +671,8 @@ static int checkGaps(FILE *fdBinFile, tTrack tracks[], int nTracks) {
          }
       }
    }
-   return writegap; 
-}   
+   return writegap;
+}
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
 
@@ -669,29 +681,29 @@ int main(int argc, char **argv) {
 
    char sLine[256];
    int i,j,q;
-   
-//   int writegap = -1;   // auto detect pregap data action by default. 
-   int writegap = 1;   // keep pregap data by default. 
-   int no_overburn = 0; 
-   int createCue = 0; 
-   char sTrack[3] = "00"; 
+
+//   int writegap = -1;   // auto detect pregap data action by default.
+   int writegap = 1;   // keep pregap data by default.
+   int no_overburn = 0;
+   int createCue = 0;
+   char sTrack[3] = "00";
    int doOneTrack = 0;
    int doInPlace = 0;
-         
+
    tTrack trackA;
    tTrack trackB;
-   
+
    tTrack tracks[100];
    int nTracks = 0;
-   
+
    char sOutdir[192];
 
    /* Tell them what I am. */
    printf("\n%s, %s\n"
-          "bin2iso V1.9bm3 - Converts RAW format (.bin) files to ISO/WAV format\n"
+          "bin2iso V1.9bm4 - Converts RAW format (.bin) files to ISO/WAV format\n"
           "MIT License\n"
           "(c) 1999 Bob Doiron\n"
-          "(c) 2020 - 2023 Michael Ortmann\n", __DATE__, __TIME__
+          "(c) 2020 - 2024 Michael Ortmann\n", __DATE__, __TIME__
          );
    if(argc < 2) {
       printf("Usage: bin2iso <cuefile> [<output dir>] [-[a]wg] [-t XX] [-i] [-nob]\n"
@@ -724,14 +736,14 @@ int main(int argc, char **argv) {
    for (i=2; i < argc; i++) {
       if (argv[i][0] == '-') {
          /* if (strncmp(&(argv[i][1]), "wg", 2)==0) {
-            writegap = 1; 
-         } else */ 
-         
+            writegap = 1;
+         } else */
+
          if (strncmp(&(argv[i][1]), "awg", 3)==0) {
-            writegap = -1; 
-            printf("Note: Auto-detecting pregap data\n");         
+            writegap = -1;
+            printf("Note: Auto-detecting pregap data\n");
          } else if (strncmp(&(argv[i][1]), "nwg", 3)==0) {
-            writegap = 0;          
+            writegap = 0;
          } else if (strncmp(&(argv[i][1]), "m2to1", 5)==0) {
             mode2to1 = 1;
             printf("Note: Converting Mode2 ISO to Mode1\n");
@@ -754,18 +766,18 @@ int main(int argc, char **argv) {
          strcpy(sOutdir, argv[2]);
       }
    }
-   
+
    if(createCue == 1) {
       fdBinFile = fopen (sBinFilename, "rb");
       if (fdBinFile == NULL) {
          printf ("Unable to open %s\n", sBinFilename);
          exit (1);
-      } 
+      }
       fdCueFile = fopen (argv[1], "w");
       if (fdCueFile == NULL) {
          printf ("Unable to create %s\n", argv[1]);
          exit (1);
-      } 
+      }
 
       if((strcmp(&sBinFilename[strlen(sBinFilename)-4], ".wav")==0) ||
          (strcmp(&sBinFilename[strlen(sBinFilename)-4], ".WAV")==0) ) {
@@ -775,12 +787,12 @@ int main(int argc, char **argv) {
 
       doCueFile();
 
-   } else {   
-      fdCueFile = fopen (argv[1], "r");      
+   } else {
+      fdCueFile = fopen (argv[1], "r");
       if (fdCueFile == NULL) {
          printf ("Unable to open %s\n", argv[1]);
          exit (1);
-      } 
+      }
 
       // get bin filename from cuefile... why? why not.
       if(! fgets( sLine, 256, fdCueFile ) ) {
@@ -791,8 +803,8 @@ int main(int argc, char **argv) {
          i = 0;
          j = 0;
          q = 0; // track open and closed quotes
-         do { 
-            sBinFilename[j] = sLine[5+i]; 
+         do {
+            sBinFilename[j] = sLine[5+i];
             i++;
             j++;
             if ((sBinFilename[j-1] == '\\') || (sBinFilename[j-1] == '/')) { j = 0; } //strip out path info
@@ -809,7 +821,7 @@ int main(int argc, char **argv) {
          printf ("Error: Filename not found on first line of cuefile %s.\n", argv[1]);
          exit (1);
       }
-   
+
       // Open the bin file
       if(doInPlace == 1) {
          fdBinFile = fopen (sBinFilename, "rb+");
@@ -826,17 +838,18 @@ int main(int argc, char **argv) {
       if(! fgets( sLine, 256, fdCueFile ) ) {
          printf ("Error Reading Cuefile\n");
          exit (1);
-      } 
-   
+      }
+
       if(strlen(sOutdir) > 0) {
          if((sOutdir[strlen(sOutdir)-1] != '/' ) && (sOutdir[strlen(sOutdir)-1] != ':' ) ) {
             strcat(sOutdir, "/");
          }
       }
-   
+
       while(!feof(fdCueFile)) {
          getTrackinfo(sLine, &tracks[nTracks++]);
       }
+      set_track_names(tracks, nTracks);
       tracks[nTracks].idx0 = tracks[nTracks].idx1 = -1;
 
       switch (tracks[0].mode) {
@@ -849,11 +862,11 @@ int main(int argc, char **argv) {
          default:  // AUDIO, MODE1_2352, MODE2_2352:
             tracks[0].offset0 = tracks[0].idx0*SIZERAW;
             break;
-      }               
+      }
       /* set offsets */
 
-      
-      if(0 != fseek(fdBinFile, 0, SEEK_END)) { 
+
+      if(0 != fseek(fdBinFile, 0, SEEK_END)) {
          perror("\nbin2iso(fseek)"); exit(1);
       }
 
@@ -916,7 +929,7 @@ int main(int argc, char **argv) {
          }
       }
 
-      
+
       /* set sizes */
       for(i = 0; i < nTracks; i++) {
          switch (tracks[i].mode) {
@@ -934,34 +947,34 @@ int main(int argc, char **argv) {
 
       if(writegap == -1)  { writegap = checkGaps(fdBinFile, tracks, nTracks); }
 
-      if(writegap == 1) 
+      if(writegap == 1)
          printf("Note: Appending pregap data to end of audio tracks\n");
-      else 
+      else
          printf("Note: Discarding pregap data\n");
 
       printf("\n");
       for(i = 0; i <= nTracks-1; i++) {
 #ifdef __DOS__
-         printf("%s (%3d Mb) - sectors %06ld:", 
-            tracks[i].name, 
-            tracks[i].size/(1024l*1024l), 
+         printf("%s (%3d Mb) - sectors %06ld:",
+            tracks[i].name,
+            tracks[i].size/(1024l*1024l),
             tracks[i].idx1
-         ); 
+         );
          printf("%06ld (offset %09ld:",
-            ( ((writegap == 0) || (tracks[i].mode != AUDIO)) ? tracks[i+1].idx0 : tracks[i+1].idx1)-1, 
-            tracks[i].offset1 
+            ( ((writegap == 0) || (tracks[i].mode != AUDIO)) ? tracks[i+1].idx0 : tracks[i+1].idx1)-1,
+            tracks[i].offset1
          );
          printf("%09ld)\n",
             ( ((writegap == 0) || (tracks[i].mode != AUDIO)) ? tracks[i+1].offset0 : tracks[i+1].offset1)-1
          );
 #else
          printf("%s (%3lu Mb) - sectors %06ld:%06ld (offset %09ld:%09ld)\n",
-            tracks[i].name, 
-            tracks[i].size/(1024*1024), 
-            tracks[i].idx1, 
-            ( ((writegap == 0) || (tracks[i].mode != AUDIO)) ? tracks[i+1].idx0 : tracks[i+1].idx1)-1, 
-            tracks[i].offset1, 
-            ( ((writegap == 0) || (tracks[i].mode != AUDIO)) ? tracks[i+1].offset0 : tracks[i+1].offset1)-1 
+            tracks[i].name,
+            tracks[i].size/(1024*1024),
+            tracks[i].idx1,
+            ( ((writegap == 0) || (tracks[i].mode != AUDIO)) ? tracks[i+1].idx0 : tracks[i+1].idx1)-1,
+            tracks[i].offset1,
+            ( ((writegap == 0) || (tracks[i].mode != AUDIO)) ? tracks[i+1].offset0 : tracks[i+1].offset1)-1
          );
 #endif
       }
@@ -970,7 +983,7 @@ int main(int argc, char **argv) {
       if( (((mode2to1 != 1) && (tracks[0].mode == MODE2_2352)) || (tracks[0].mode == MODE1_2048)) && (nTracks == 1) ) {
          if(tracks[0].mode == MODE2_2352) { printf("Mode2/2352"); }
          if(tracks[0].mode == MODE1_2048) { printf("Mode1/2048"); }
-         printf(" single track bin file indicated by cue file\n");   
+         printf(" single track bin file indicated by cue file\n");
          fclose(fdBinFile);
          if( 0 != rename(sBinFilename, tracks[0].name) ) {
             perror("\nbin2iso(rename)");
@@ -982,14 +995,14 @@ int main(int argc, char **argv) {
       }
 
       for(i=nTracks-1; i>=0; i--) {
-         trackA = tracks[i];         
+         trackA = tracks[i];
          trackB = tracks[i+1];
          // audio can't be done in the bin file due to header.
          // 2336 can't either because it's expanded to 2352
          if((doInPlace == 1) && (i == 0) && (trackA.mode != AUDIO) && (trackA.mode != MODE2_2336) ) {
             sOutFilename[0] = '\0';
          } else {
-            strcpy(sOutFilename, sOutdir); 
+            strcpy(sOutFilename, sOutdir);
             strcat(sOutFilename, trackA.name);
          }
          if ( ((doOneTrack == 1) && strcmp(trackA.num, sTrack)==0) || (doOneTrack == 0) ) {
@@ -1022,12 +1035,12 @@ int main(int argc, char **argv) {
                   perror("\nbin2iso(rename)");
                   exit(1);
                }
-            
+
                // fix writepos for case when simply truncating...
                if((trackA.mode == MODE2_2352) || (trackA.mode == MODE1_2048)){ writepos = trackB.offset0; }
 
                printf("Truncating to %ld bytes\n", writepos);
-            
+
                fdBinFile = fopen(trackA.name, "rb+"); // gets closed in doTrack...
                if(fdBinFile == NULL) { perror("bin2iso(fopen)"); exit(1); }
 
@@ -1037,9 +1050,9 @@ int main(int argc, char **argv) {
                }
             }
          }
-      }   
+      }
    }
    fclose(fdCueFile);
    fclose(fdBinFile);
-   return(0);  
+   return(0);
 }
