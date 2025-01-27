@@ -1,3 +1,9 @@
+This fork is no longer maintained in favor of https://gitlab.com/bunnylin/bin2iso.
+
+So please use https://gitlab.com/bunnylin/bin2iso instead.
+
+
+
 Description:
 
   bin2iso converts RAW format (.bin) files to ISO/WAV format.
