@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: MIT */
-/* Copyright (c) 1999 Bob Doiron, 2020 - 2024 Michael Ortmann */
+/* Copyright (c) 1999 Bob Doiron, 2020 - 2025 Michael Ortmann */
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,24 +17,20 @@
 #define CHECK 0 /* don't bother checking bin for validity... */
 
 //----------------Wave Stuff---------------------/
-typedef unsigned char BYTE1 ;
-typedef unsigned short int BYTE2 ;
-typedef unsigned long int  BYTE4 ;
-
 typedef struct wavHdr {
-   BYTE1 riff[4];
-   BYTE4 bytestoend;
-   BYTE1 wavetxt[4];
-   BYTE1 fmttxt[4];
-   BYTE4 formatsize;  // 16 byte format specifier
-   BYTE2 format;          // Windows PCM
-   BYTE2 channels;             // 2 channels
-   BYTE4 samplerate;       // 44,100 Samples/sec
-   BYTE4 avgbyterate;     // 176,400 Bytes/sec
-   BYTE2 samplebytes;          // 4 bytes/sample
-   BYTE2 channelbits;         // 16 bits/channel
-   BYTE1 datatxt[4];
-   BYTE4 blocksize;
+   char riff[4];
+   uint32_t bytestoend;
+   char wavetxt[4];
+   char fmttxt[4];
+   uint32_t formatsize;  // 16 byte format specifier
+   uint16_t format;      // Windows PCM
+   uint16_t channels;    // 2 channels
+   uint32_t samplerate;  // 44,100 Samples/sec
+   uint32_t avgbyterate; // 176,400 Bytes/sec
+   uint16_t samplebytes; // 4 bytes/sample
+   uint16_t channelbits; // 16 bits/channel
+   char datatxt[4];
+   uint32_t blocksize;
 } tWavHead;
 
 #define HEADBYTES 36
@@ -119,8 +116,8 @@ typedef struct track
    unsigned short mode;
    unsigned long idx0;
    unsigned long idx1;
-   unsigned char num[3];
-   unsigned char name[80];
+   char num[3];
+   char name[80];
    unsigned long offset0;
    unsigned long offset1;
    unsigned long size; /* track size in bytes */
@@ -700,10 +697,10 @@ int main(int argc, char **argv) {
 
    /* Tell them what I am. */
    printf("\n%s, %s\n"
-          "bin2iso V1.9bm4 - Converts RAW format (.bin) files to ISO/WAV format\n"
+          "bin2iso V1.9bm5 - Converts RAW format (.bin) files to ISO/WAV format\n"
           "MIT License\n"
           "(c) 1999 Bob Doiron\n"
-          "(c) 2020 - 2024 Michael Ortmann\n", __DATE__, __TIME__
+          "(c) 2020 - 2025 Michael Ortmann\n", __DATE__, __TIME__
          );
    if(argc < 2) {
       printf("Usage: bin2iso <cuefile> [<output dir>] [-[a]wg] [-t XX] [-i] [-nob]\n"
@@ -782,7 +779,10 @@ int main(int argc, char **argv) {
       if((strcmp(&sBinFilename[strlen(sBinFilename)-4], ".wav")==0) ||
          (strcmp(&sBinFilename[strlen(sBinFilename)-4], ".WAV")==0) ) {
          printf(".wav binfile - Skipping wav header\n");
-         fread( sLine, 1, sizeof(tWavHead), fdBinFile );
+         if (fread(sLine, 1, sizeof(tWavHead), fdBinFile ) < sizeof(tWavHead)) {
+            fprintf(stderr, "fread(%s)\n", sBinFilename);
+            exit(1);
+         }
       }
 
       doCueFile();
